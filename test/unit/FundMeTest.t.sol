@@ -7,7 +7,6 @@ import {FundMe} from "../../src/FundMe.sol";
 import {DeployFundMe} from "../../script/DeployFundMe.s.sol";
 
 contract FundMeTest is Test {
-
     FundMe fundMe;
 
     address USER = makeAddr("user");
@@ -23,7 +22,6 @@ contract FundMeTest is Test {
         vm.deal(USER, STARTING_BALANCE);
     }
 
-
     function testFundFailsWithoutEnoughETH() public {
         vm.expectRevert();
 
@@ -31,14 +29,12 @@ contract FundMeTest is Test {
     }
 
     function testFundUpdatesFundedDataStructure() public {
-
         vm.prank(USER); // next tx will be sent by USER
 
         fundMe.fund{value: SEND_VALUE}();
         uint256 amountFunded = fundMe.getAddressToAmountFunded(USER);
         assertEq(amountFunded, SEND_VALUE);
     }
-
 
     function testAddsFunderToArrayOfFunders() public {
         vm.prank(USER);
@@ -55,16 +51,12 @@ contract FundMeTest is Test {
     }
 
     function testOnlyOwnerCanWithdraw() public funded {
-
         vm.prank(USER);
         vm.expectRevert();
         fundMe.withdraw();
-
     }
 
-
     function testWithdrawWithASingleFunder() public funded {
-
         // Arrange
         uint256 startingOwnerBalance = fundMe.getOwner().balance;
         uint256 startingFundMeBalance = address(fundMe).balance;
@@ -83,20 +75,14 @@ contract FundMeTest is Test {
         uint256 endingOwnerBalance = fundMe.getOwner().balance;
         uint256 endingFundMeBalance = address(fundMe).balance;
         assertEq(endingFundMeBalance, 0);
-        assertEq(
-            startingFundMeBalance + startingOwnerBalance,
-            endingOwnerBalance
-        );
-
+        assertEq(startingFundMeBalance + startingOwnerBalance, endingOwnerBalance);
     }
 
-
     function testWithdrawFromMultipleFunders() public funded {
-
         // Arrange
         uint160 numberOfFunders = 10;
         uint160 startingFunderIndex = 1;
-        for(uint160 i = startingFunderIndex; i < numberOfFunders; i++){
+        for (uint160 i = startingFunderIndex; i < numberOfFunders; i++) {
             // vm.prank new address
             // vm.deal new address
             hoax(address(i), SEND_VALUE);
@@ -114,20 +100,14 @@ contract FundMeTest is Test {
 
         // Assert
         assert(address(fundMe).balance == 0);
-        assert(
-            startingFundMeBalance + startingOwnerBalance ==
-            fundMe.getOwner().balance
-        );
-
+        assert(startingFundMeBalance + startingOwnerBalance == fundMe.getOwner().balance);
     }
 
-
     function testCheaperWithdrawFromMultipleFunders() public funded {
-
         // Arrange
         uint160 numberOfFunders = 10;
         uint160 startingFunderIndex = 1;
-        for(uint160 i = startingFunderIndex; i < numberOfFunders; i++){
+        for (uint160 i = startingFunderIndex; i < numberOfFunders; i++) {
             // vm.prank new address
             // vm.deal new address
             hoax(address(i), SEND_VALUE);
@@ -145,13 +125,6 @@ contract FundMeTest is Test {
 
         // Assert
         assert(address(fundMe).balance == 0);
-        assert(
-            startingFundMeBalance + startingOwnerBalance ==
-            fundMe.getOwner().balance
-        );
-
+        assert(startingFundMeBalance + startingOwnerBalance == fundMe.getOwner().balance);
     }
-
-
-
 }
